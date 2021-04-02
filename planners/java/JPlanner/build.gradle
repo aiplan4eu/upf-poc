@@ -1,14 +1,19 @@
-apply plugin: 'java'
-apply plugin: 'jacoco'
-apply plugin: 'application'
+plugins {
+    id 'java'
+}
 
-
-mainClassName = 'JPlanner.Main'
+group 'eu.aiplan4eu.jplanner'
+version '1.0-SNAPSHOT'
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    testImplementation     'junit:junit:4.13'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
+}
+
+test {
+    useJUnitPlatform()
 }

@@ -1,4 +1,4 @@
-package JPlanner;
+package eu.aiplan4eu.jplanner;
 
 import java.util.HashSet;
 import java.util.LinkedList;
