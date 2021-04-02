@@ -99,12 +99,6 @@ namespace cppplanner
       auto current = open_list.top();
       open_list.pop();
       auto state = std::get<1>(current);
-
-      for (auto& a : state) {
-        std::cout << a << " ";
-      }
-      std::cout << std::endl;
-
       if (closed_list.find(state) == closed_list.end()) {
         closed_list.insert(state);
         if (is_subset(problem.goal(), state)) {

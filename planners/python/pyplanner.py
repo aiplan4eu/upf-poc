@@ -1,6 +1,17 @@
 from dataclasses import dataclass
 from typing import FrozenSet, Callable, List
 import heapq
+from contextlib import contextmanager
+from time import time
+
+@contextmanager
+def timing(description: str) -> None:
+    start = time()
+    yield
+    elapsed_time = (time() - start) * 1000
+
+    print(f"{description}: {elapsed_time}ms")
+
 
 @dataclass
 class Action:
@@ -55,8 +66,15 @@ def main():
             return 1.0
         return 10.0
 
-    solver = Solver(heuristic=heuristic)
-    plan = solver.solve(problem)
+
+    with timing("Without Heuristic"):
+        solver = Solver(heuristic=None)
+        plan = solver.solve(problem)
+    print(plan)
+
+    with timing("With Heuristic"):
+        solver = Solver(heuristic=heuristic)
+        plan = solver.solve(problem)
     print(plan)
 
 if __name__ == '__main__':
