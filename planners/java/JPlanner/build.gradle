@@ -66,3 +66,7 @@ sourceSets {
     }
 }
 
+task(runServer, dependsOn: 'classes', type: JavaExec) {
+    main = 'eu.aiplan4eu.jplanner.grpc.GRPCServer'
+    classpath = sourceSets.main.runtimeClasspath
+}
