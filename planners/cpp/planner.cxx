@@ -1,8 +1,40 @@
+#include<algorithm>
+#include<memory>
+#include<unordered_set>
+
 #include "planner.hxx"
+
 
 namespace cppplanner
 {
-  using EType = std::tuple<double, std::set<std::string>, std::vector<std::string>>;
+  using EType = std::tuple<double, std::shared_ptr<std::set<std::string>>, std::vector<std::string>>;
+
+  template <class T> inline void hash_combine(std::size_t& seed, T const& v)
+  {
+    seed ^= std::hash<T>()(v) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+  }
+
+  struct set_string_hash
+  {
+    std::size_t operator()(std::shared_ptr<std::set<std::string>> const& obj) const
+    {
+      std::size_t res = 0;
+      for (auto& x : *obj) {
+        hash_combine(res, x);
+      }
+      return res;
+    }
+  };
+
+  struct set_string_eq
+  {
+    bool operator()(std::shared_ptr<std::set<std::string>> const& obj1, std::shared_ptr<std::set<std::string>> const& obj2) const
+    {
+      return *obj1 == *obj2;
+    }
+  };
+
+
 
   Action::Action(const std::string& name,
                  const std::set<std::string>& precondition,
@@ -77,39 +109,39 @@ namespace cppplanner
   }
 
 
-  static std::set<std::string> action_apply(const Action& a, const std::set<std::string>& state)
+  static inline std::shared_ptr<std::set<std::string>> action_apply(const Action& a, const std::set<std::string>& state)
   {
-    std::set<std::string> child(state);
+    auto child = std::make_shared<std::set<std::string>>(state);
     for (auto& x : a.negative_effect()) {
-      child.erase(x);
+      child->erase(x);
     }
     for (auto& x : a.positive_effect()) {
-      child.insert(x);
+      child->insert(x);
     }
     return child;
   }
 
-  std::optional<std::vector<std::string>> solve(Problem problem, std::function<float(std::set<std::string>)> heuristic)
+  std::optional<std::vector<std::string>> solve(Problem problem, std::function<double(std::set<std::string>)> heuristic)
   {
     std::priority_queue<EType, std::vector<EType>, std::greater<EType>> open_list;
     double initf = heuristic(problem.init());
-    open_list.emplace(initf, problem.init(), std::vector<std::string>());
-    std::set<std::set<std::string>> closed_list;
+    open_list.emplace(initf, std::make_shared<std::set<std::string>>(problem.init()), std::vector<std::string>{});
+    std::unordered_set<std::shared_ptr<std::set<std::string>>, set_string_hash, set_string_eq> closed_list;
     while (!open_list.empty()) {
       auto current = open_list.top();
       open_list.pop();
       auto state = std::get<1>(current);
       if (closed_list.find(state) == closed_list.end()) {
         closed_list.insert(state);
-        if (is_subset(problem.goal(), state)) {
+        if (is_subset(problem.goal(), *state)) {
           return std::get<2>(current);
         }
         else {
           for (auto& a : problem.actions()) {
-            if (is_subset(a.precondition(), state)) {
-              std::set<std::string> child = action_apply(a, state);
+            if (is_subset(a.precondition(), *state)) {
+              auto child = action_apply(a, *state);
               if (closed_list.find(child) == closed_list.end()) {
-                double f = std::get<2>(current).size() + 1 + heuristic(child);
+                double f = std::get<2>(current).size() + 1 + heuristic(*child);
                 auto new_path = std::get<2>(current);
                 new_path.push_back(a.name());
                 open_list.emplace(f, child, new_path);

@@ -31,7 +31,7 @@ PYBIND11_MODULE(cppplanner_upf, m) {
           py::overload_cast<cppplanner::Problem>(&cppplanner::solve),
           "Solves a problem without heuristic");
     m.def("solve",
-          py::overload_cast<cppplanner::Problem, std::function<float(std::set<std::string>)>>(&cppplanner::solve),
+          py::overload_cast<cppplanner::Problem, std::function<double(std::set<std::string>)>>(&cppplanner::solve),
           "Solves a problem with heuristic");
 
 }

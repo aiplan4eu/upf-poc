@@ -11,23 +11,29 @@ def timing(description: str) -> None:
 
     print(f"{description}: {elapsed_time}ms")
 
+
+def generate_problem(size: int) -> Problem:
+    actions = [Action('mk_y', set(['x']), set(['y']), set(['x'])),
+               Action('reset_x', set([]), set(['x']), set([]))]
+    goal = []
+    for i in range(size):
+        name = f"v{i}"
+        goal.append(name)
+        actions.append(Action(f'mk_{name}', set(['y']), set([name]), set(['y'])),)
+    init = set(['x'])
+    return Problem(actions, init, set(goal))
+
+
 def main():
-    actions = [Action('a', set(['x']), set(['y']), set(['x'])),
-               Action('b', set(['y']), set(['z']), set(['y'])),
-               Action('c', set(['y']), set(['w']), set(['y'])),
-               Action('d', set([]), set(['x']), set([]))]
-    problem = Problem(actions, set(['x']), set(['z', 'w']))
+    size = 15
+    problem = generate_problem(size)
 
     with timing("Without Heuristic"):
         plan = solve(problem)
     print(plan)
 
     def heuristic(state: Set[str]) -> float:
-        if 'z' in state:
-            return 1.0
-        if 'w' in state:
-            return 1.0
-        return 10.0
+        return size - len(state & problem.goal)
 
     with timing("With Heuristic"):
         plan = solve(problem, heuristic)

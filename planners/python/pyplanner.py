@@ -52,20 +52,24 @@ class Solver():
                             heapq.heappush(open_list, (child_f, child, path+[act.name]))
 
 
+def generate_problem(size: int) -> Problem:
+    actions = [Action('mk_y', frozenset(['x']), frozenset(['y']), frozenset(['x'])),
+               Action('reset_x', frozenset([]), frozenset(['x']), frozenset([]))]
+    goal = []
+    for i in range(size):
+        name = f"v{i}"
+        goal.append(name)
+        actions.append(Action(f'mk_{name}', frozenset(['y']), frozenset([name]), frozenset(['y'])),)
+    init = frozenset(['x'])
+    return Problem(actions, init, frozenset(goal))
+
+
 def main():
-    actions = [Action('a', frozenset(['x']), frozenset(['y']), frozenset(['x'])),
-               Action('b', frozenset(['y']), frozenset(['z']), frozenset(['y'])),
-               Action('c', frozenset(['y']), frozenset(['w']), frozenset(['y'])),
-               Action('d', frozenset([]), frozenset(['x']), frozenset([]))]
-    problem = Problem(actions, frozenset(['x']), frozenset(['z', 'w']))
+    size = 15
+    problem = generate_problem(size)
 
     def heuristic(state: FrozenSet[str]) -> float:
-        if 'z' in state:
-            return 1.0
-        if 'w' in state:
-            return 1.0
-        return 10.0
-
+        return size - len(state & problem.goal)
 
     with timing("Without Heuristic"):
         solver = Solver(heuristic=None)

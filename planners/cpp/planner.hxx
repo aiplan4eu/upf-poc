@@ -56,7 +56,7 @@ namespace cppplanner
     std::set<std::string> goal_;
   };
 
-  std::optional<std::vector<std::string>> solve(Problem problem, std::function<float(std::set<std::string>)> heuristic);
+  std::optional<std::vector<std::string>> solve(Problem problem, std::function<double(std::set<std::string>)> heuristic);
 
   std::optional<std::vector<std::string>> solve(Problem problem);
 
