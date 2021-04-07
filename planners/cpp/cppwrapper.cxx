@@ -6,7 +6,7 @@
 
 namespace py = pybind11;
 
-PYBIND11_MODULE(cppplanner_upf, m) {
+PYBIND11_MODULE(_cppplanner_upf, m) {
     m.doc() = "UPF c++->python example";
 
     py::class_<cppplanner::Action>(m, "Action")
@@ -30,7 +30,7 @@ PYBIND11_MODULE(cppplanner_upf, m) {
     m.def("solve",
           py::overload_cast<cppplanner::Problem>(&cppplanner::solve),
           "Solves a problem without heuristic");
-    m.def("solve",
+    m.def("solve_with_heuristic",
           py::overload_cast<cppplanner::Problem, std::function<double(std::set<std::string>)>>(&cppplanner::solve),
           "Solves a problem with heuristic");
 

@@ -64,10 +64,12 @@ public class Solver {
                             Set<String> child = new HashSet<>(current.state);
                             child.removeAll(a.getNegativeEffect());
                             child.addAll(a.getPositiveEffect());
-                            double f = current.path.size() + 1 + heuristic.evaluate(child);
-                            List<String> child_path = new LinkedList<>(current.path);
-                            child_path.add(a.getName());
-                            queue.add(new E(child, child_path, f));
+                            if (!visited.contains(child)) {
+                                double f = current.path.size() + 1 + heuristic.evaluate(child);
+                                List<String> child_path = new LinkedList<>(current.path);
+                                child_path.add(a.getName());
+                                queue.add(new E(child, child_path, f));
+                            }
                         }
                     }
                 }
