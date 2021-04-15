@@ -4,27 +4,30 @@ import eu.aiplan4eu.jclient.grpc.GRPCClient;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 public class Main {
 
-    public static final <T> Set<T> newHashSet(T... obs) {
-        Set<T> set = new HashSet<>();
-        Collections.addAll(set, obs);
-        return set;
+    public static Problem generateProblem(int size) {
+        Set<Action> actions = new HashSet<>();
+        Action a1 = new Action("mk_y", Collections.singleton("x"), Collections.singleton("y"), Collections.singleton("x"));
+        actions.add(a1);
+        Action a2 = new Action("reset_x", Collections.emptySet(), Collections.singleton("x"), Collections.emptySet());
+        actions.add(a2);
+        Set<String> goal = new HashSet<>();
+        for (int i = 0; i < size; i++) {
+            String name = "v"+i;
+            goal.add(name);
+            Action a = new Action("mk_"+name, Collections.singleton("y"), Collections.singleton(name), Collections.singleton("y"));
+            actions.add(a);
+        }
+        Problem problem = new Problem(actions, Collections.singleton("x"), goal);
+        return problem;
     }
 
     public static void main(String[] args) throws InterruptedException {
-        Action a = new Action("a", Collections.singleton("x"), Collections.singleton("y"), Collections.singleton("x"));
-        Action b = new Action("b", Collections.singleton("y"), Collections.singleton("z"), Collections.singleton("y"));
-        Action c = new Action("c", Collections.singleton("y"), Collections.singleton("w"), Collections.singleton("y"));
-        Action d = new Action("d", Collections.emptySet(), Collections.singleton("x"), Collections.emptySet());
-
-        Problem problem = new Problem(newHashSet(a, b, c, d), Collections.singleton("x"), newHashSet("z", "w"));
+        Problem problem = generateProblem(15);
 
         List<String> planners = List.of("pyplanner_upf", "cppplanner_upf", "jplanner_upf");
 
@@ -37,7 +40,7 @@ public class Main {
                 List<String> plan1 = client.solve(problem, planner);
                 System.out.println(plan1);
                 // System.out.println(planner + " with heuristic:");
-                // List<String> plan2 = client.solve(problem, new Heuristic(), planner);
+                // List<String> plan2 = client.solve(problem, new Heuristic(problem.getGoal()), planner);
                 // System.out.println(plan2);
                 System.out.println();
             }
