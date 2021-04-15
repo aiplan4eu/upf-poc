@@ -1,0 +1,49 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "eu.aiplan4eu.jclient.grpc";
+option java_outer_classname = "JClientGRPC";
+option objc_class_prefix = "HLW";
+
+package eu.aiplan4eu.jclient.grpc;
+
+service JClientUPF {
+  rpc solve (ProblemMessage) returns (PlanMessage) {}
+  rpc solveWithHeuristic (stream ProblemOrHAnswer) returns (stream PlanOrHRequest) {}
+}
+
+message ActionMessage {
+  string name = 1;
+  repeated string precondition = 2;
+  repeated string positiveEffect = 3;
+  repeated string negativeEffect = 4;
+}
+
+message ProblemMessage {
+  string planner = 4;
+  repeated ActionMessage actions = 5;
+  repeated string init = 6;
+  repeated string goal = 7;
+}
+
+message PlanMessage {
+  repeated string actions = 8;
+}
+
+message State {
+  repeated string state = 9;
+}
+
+message ProblemOrHAnswer {
+  oneof oneof1 {
+    ProblemMessage problem = 10;
+    double stateEvaluation = 11;
+  }
+}
+
+message PlanOrHRequest {
+  oneof _oneof2 {
+    PlanMessage plan = 12;
+    State stateToEvaluate = 13;
+  }
+}
