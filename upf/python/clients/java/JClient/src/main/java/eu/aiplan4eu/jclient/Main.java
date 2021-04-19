@@ -27,7 +27,7 @@ public class Main {
     }
 
     public static void main(String[] args) throws InterruptedException {
-        Problem problem = generateProblem(15);
+        Problem problem = generateProblem(10);
 
         List<String> planners = List.of("pyplanner_upf", "cppplanner_upf", "jplanner_upf");
 
@@ -39,9 +39,9 @@ public class Main {
                 System.out.println(planner + " with no heuristic:");
                 List<String> plan1 = client.solve(problem, planner);
                 System.out.println(plan1);
-                // System.out.println(planner + " with heuristic:");
-                // List<String> plan2 = client.solve(problem, new Heuristic(problem.getGoal()), planner);
-                // System.out.println(plan2);
+                System.out.println(planner + " with heuristic:");
+                List<String> plan2 = client.solve(problem, new Heuristic(problem.getGoal()), planner);
+                System.out.println(plan2);
                 System.out.println();
             }
         } finally {

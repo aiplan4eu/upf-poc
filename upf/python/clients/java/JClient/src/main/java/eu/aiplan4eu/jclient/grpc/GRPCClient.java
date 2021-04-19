@@ -40,45 +40,92 @@ public class GRPCClient {
         return plan.getActionsList();
     }
 
-    public List<String> solve(Problem problem, Heuristic heuristic, String planner) {
-        final List<String> plan = new ArrayList<>();
-        final Set<String> state = new HashSet<>();
-        StreamObserver<ProblemOrHAnswer> streamObserver = asyncStub.solveWithHeuristic(new StreamObserver<PlanOrHRequest>() {
-            @Override
-            public void onNext(final PlanOrHRequest value) {
-                switch (value.getOneof2Case()) {
-                    case PLAN:
-                        plan.addAll(value.getPlan().getActionsList());
-                        break;
-                    case STATETOEVALUATE:
-                        ProtocolStringList stateList = value.getStateToEvaluate().getStateList();
-                        state.clear();
-                        for (String s : stateList) {
-                            state.add(s);
-                        }
-                        break;
-                    default:
-                        throw new RuntimeException("Invalid request!");
-                }
-            }
+    static private class RequestStreamObserver implements StreamObserver<PlanOrHRequest> {
 
-            @Override
-            public void onError(Throwable t) {
+        private StreamObserver<ProblemOrHAnswer> answerChannel;
+        private List<String> plan;
+        private Heuristic heuristic;
+        private boolean ready;
 
-            }
-
-            @Override
-            public void onCompleted() {
-
-            }
-        });
-
-        streamObserver.onNext(ProblemOrHAnswer.newBuilder().setProblem(encode(problem, planner)).build());
-        while (plan.isEmpty()) {
-            streamObserver.onNext(ProblemOrHAnswer.newBuilder().setStateEvaluation(heuristic.evaluate(state)).build());
+        public RequestStreamObserver(Heuristic heuristic) {
+            this.heuristic = heuristic;
+            plan = new ArrayList<>();
+            answerChannel = null;
+            ready = false;
         }
 
-        return plan;
+        @Override
+        public void onNext(PlanOrHRequest value) {
+            //System.out.println("Recv: " + value);
+            switch (value.getOneof2Case()) {
+                case PLAN:
+                    //System.out.println("Got plan " + value.getPlan());
+                    plan.addAll(value.getPlan().getActionsList());
+                    synchronized (this) {
+                        this.notify();
+                    }
+                    ready = true;
+                    break;
+                case STATETOEVALUATE:
+                    ProtocolStringList stateList = value.getStateToEvaluate().getStateList();
+                    final double hval = heuristic.evaluate(new HashSet<>(stateList));
+                    answerChannel.onNext(ProblemOrHAnswer.newBuilder().setStateEvaluation(hval).build());
+                    break;
+                default:
+                    throw new RuntimeException("Invalid request!");
+            }
+        }
+
+        @Override
+        public void onError(Throwable t) {
+            t.printStackTrace();
+        }
+
+        @Override
+        public void onCompleted() {
+            //System.out.println("Completed!");
+        }
+
+        public void setAnswerChannel(StreamObserver<ProblemOrHAnswer> answerChannel) {
+            this.answerChannel = answerChannel;
+        }
+
+        public List<String> getPlan() {
+            return plan;
+        }
+
+        public synchronized boolean isReady() {
+            return ready;
+        }
+    }
+
+    public List<String> solve(Problem problem, Heuristic heuristic, String planner) {
+        RequestStreamObserver requestStreamObserver = new RequestStreamObserver(heuristic);
+        StreamObserver<ProblemOrHAnswer> responseStreamObserver = asyncStub.solveWithHeuristic(requestStreamObserver);
+        requestStreamObserver.setAnswerChannel(responseStreamObserver);
+
+        //System.out.println("Send: problem");
+        responseStreamObserver.onNext(ProblemOrHAnswer.newBuilder().setProblem(encode(problem, planner)).build());
+
+//        while (!requestStreamObserver.isReady()) {
+//            try {
+//                Thread.sleep(1);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//        }
+
+        synchronized (requestStreamObserver) {
+            try {
+                requestStreamObserver.wait();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        List<String> res = requestStreamObserver.getPlan();
+        responseStreamObserver.onCompleted();
+        return res;
     }
 
 

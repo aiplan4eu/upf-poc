@@ -3,7 +3,6 @@ syntax = "proto3";
 option java_multiple_files = true;
 option java_package = "eu.aiplan4eu.jclient.grpc";
 option java_outer_classname = "JClientGRPC";
-option objc_class_prefix = "HLW";
 
 package eu.aiplan4eu.jclient.grpc;
 
@@ -35,7 +34,7 @@ message State {
 }
 
 message ProblemOrHAnswer {
-  oneof oneof1 {
+  oneof _oneof1 {
     ProblemMessage problem = 10;
     double stateEvaluation = 11;
   }
