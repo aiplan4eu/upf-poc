@@ -1,4 +1,4 @@
-import _cppplanner_pyupf as cpp
+import _cppplanner_upf as cpp
 
 def _upf_action_to_cpp(action):
     return cpp.Action(action.name, action.precondition, action.positive_effect, action.negative_effect)
