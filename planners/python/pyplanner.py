@@ -35,7 +35,7 @@ class Solver():
             self.heuristic = lambda x: 0
 
     def solve(self, problem: Problem) -> List[str]:
-        open_list = [(self.heuristic(problem.init), problem.init, [])]
+        open_list = [(self.heuristic(set(problem.init)), problem.init, [])]
         closed_list = set()
         while open_list:
             _, current, path = heapq.heappop(open_list)
@@ -48,7 +48,7 @@ class Solver():
                     if act.precondition.issubset(current):
                         child = current.difference(act.negative_effect).union(act.positive_effect)
                         if child not in closed_list:
-                            child_f = len(path) + 1 + self.heuristic(child)
+                            child_f = len(path) + 1 + self.heuristic(set(child))
                             heapq.heappush(open_list, (child_f, child, path+[act.name]))
 
 

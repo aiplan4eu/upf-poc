@@ -7,27 +7,6 @@
 
 namespace py = pybind11;
 
-struct heuristic_class
-{
-  heuristic_class(std::function<double(std::set<std::string>)> heuristic_) : heuristic_fun(heuristic_) {}
-
-  double compute(py::object state)
-  {
-    std::set<std::string> set;
-    for (py::handle obj : state) {
-      set.insert(obj.attr("__str__")().cast<std::string>());
-    }
-    return heuristic_fun(set);
-  }
-
-  std::function<double(std::set<std::string>)> heuristic_fun;
-};
-
-PYBIND11_EMBEDDED_MODULE(my_heuristic, m) {
-    py::class_<heuristic_class>(m, "Heuristic")
-      .def(py::init<std::function<double(std::set<std::string>)> >())
-      .def("__call__", &heuristic_class::compute);
-}
 
 std::optional<std::vector<std::string>> _solve(upf::Problem& problem, std::function<double(std::set<std::string>)> heuristic)
 {
@@ -64,8 +43,7 @@ std::optional<std::vector<std::string>> _solve(upf::Problem& problem, std::funct
   }
   auto p = planner_problem(actions, frozenset(init), frozenset(goal));
 
-  auto my_heuristic = py::module::import("my_heuristic");
-  auto solver = pyplanner.attr("Solver")(my_heuristic.attr("Heuristic")(heuristic));
+  auto solver = pyplanner.attr("Solver")(heuristic);
 
   auto pyplan = py::list(solver.attr("solve")(p));
   std::vector<std::string> res;
