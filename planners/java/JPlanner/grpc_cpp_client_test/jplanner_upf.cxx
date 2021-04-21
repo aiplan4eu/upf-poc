@@ -79,39 +79,27 @@ public:
     std::shared_ptr<ClientReaderWriter<ProblemOrHAnswer, PlanOrHRequest> > stream(
         stub_->solveWithHeuristic(&context));
 
-    PlanOrHRequest* r = new PlanOrHRequest();
-    std::cout << "!!" << std::endl;
-    std::thread writer([stream](upf::Problem p,
-                                std::function<double(std::set<std::string>)> fun,
-                                PlanOrHRequest* request) {
-        std::cout << "??" << std::endl;
-        ProblemOrHAnswer answer;
-        answer.mutable_problem()->CopyFrom(MakeProblemMessage(p));
-        stream->Write(answer);
-        while (stream->Read(request)) {
-          if (request->has_plan()) {
-            break;
-          }
-          auto state_message = request->statetoevaluate();
-          std::set<std::string> state;
-          for (int i=0; i<state_message.state_size(); i++) {
-            auto p = state_message.state(i);
-            state.insert(p);
-            std::cout << p << std::endl;
-          }
-          ProblemOrHAnswer response;
-          response.set_stateevaluation(fun(state));
-          stream->Write(response);
-        }
+    PlanOrHRequest request;
+    ProblemOrHAnswer answer;
+    answer.mutable_problem()->CopyFrom(MakeProblemMessage(problem));
+    stream->Write(answer);
+    while (stream->Read(&request)) {
+      if (request.has_plan()) {
         stream->WritesDone();
-        std::cout << "++" << std::endl;
-    }, problem, heuristic, r);
-    writer.join();
-    std::cout << "--" << std::endl;
-
-    if (r->has_plan()) {
-      return ConvertPlanMessage(r->plan());
+        return ConvertPlanMessage(request.plan());
+      }
+      auto state_message = request.statetoevaluate();
+      std::set<std::string> state;
+      for (int i=0; i<state_message.state_size(); i++) {
+        auto p = state_message.state(i);
+        state.insert(p);
+      }
+      ProblemOrHAnswer response;
+      response.set_stateevaluation(heuristic(state));
+      stream->Write(response);
     }
+    stream->WritesDone();
+
     return {};
   }
 
