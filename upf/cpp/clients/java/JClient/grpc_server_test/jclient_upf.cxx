@@ -20,6 +20,7 @@ using eu::aiplan4eu::jclient::grpc::ProblemMessage;
 using eu::aiplan4eu::jclient::grpc::ProblemOrHAnswer;
 using eu::aiplan4eu::jclient::grpc::PlanMessage;
 using eu::aiplan4eu::jclient::grpc::PlanOrHRequest;
+using eu::aiplan4eu::jclient::grpc::State;
 using eu::aiplan4eu::jclient::grpc::JClientUPF;
 
 upf::Action ConvertActionMessage(const ActionMessage& action_message)
@@ -74,7 +75,29 @@ class JClientUPFImpl final : public JClientUPF::Service {
   Status solveWithHeuristic(ServerContext* context,
                             ServerReaderWriter<PlanOrHRequest, ProblemOrHAnswer>* stream)
   {
-
+    ProblemOrHAnswer problem;
+    stream->Read(&problem);
+    auto h = [stream](std::set<std::string> state){
+               State state_grpc;
+               for (auto& s : state) {
+                 state_grpc.add_state(s);
+               }
+               PlanOrHRequest request;
+               request.mutable_statetoevaluate()->CopyFrom(state_grpc);
+               stream->Write(request);
+               ProblemOrHAnswer response;
+               stream->Read(&response);
+               return response.stateevaluation();
+             };
+    if (auto plan = upf::solve(problem.problem().planner(), ConvertProblemMessage(problem.problem()), h)) {
+      PlanOrHRequest response;
+      PlanMessage message;
+      for (auto& s : *plan) {
+        message.add_actions(s);
+      }
+      response.mutable_plan()->CopyFrom(message);
+      stream->Write(response);
+    }
     return Status::OK;
   }
 
