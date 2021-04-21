@@ -8,7 +8,7 @@
 namespace py = pybind11;
 
 
-std::optional<std::vector<std::string>> _solve(upf::Problem& problem, std::function<double(std::set<std::string>)> heuristic)
+py::object convert_problem(upf::Problem& problem)
 {
   auto pyplanner = py::module::import("pyplanner");
   auto frozenset = py::module::import("builtins").attr("frozenset");
@@ -42,10 +42,11 @@ std::optional<std::vector<std::string>> _solve(upf::Problem& problem, std::funct
     goal.attr("add")(py::str(p));
   }
   auto p = planner_problem(actions, frozenset(init), frozenset(goal));
+  return p;
+}
 
-  auto solver = pyplanner.attr("Solver")(heuristic);
-
-  auto pyplan = py::list(solver.attr("solve")(p));
+std::vector<std::string> convert_plan(py::list pyplan)
+{
   std::vector<std::string> res;
   for (py::handle obj : pyplan) {
     res.push_back(obj.attr("__str__")().cast<std::string>());
@@ -53,13 +54,38 @@ std::optional<std::vector<std::string>> _solve(upf::Problem& problem, std::funct
   return res;
 }
 
-
-std::optional<std::vector<std::string>> solve(upf::Problem& problem, std::function<double(std::set<std::string>)> heuristic)
+std::optional<std::vector<std::string>> solve_with_heuristic(upf::Problem& problem, std::function<double(std::set<std::string>)> heuristic)
 {
   try {
     py::scoped_interpreter guard{};
-    return _solve(problem, heuristic);
+    auto p = convert_problem(problem);
+    auto pyplanner = py::module::import("pyplanner");
+    auto solver = pyplanner.attr("Solver")(heuristic);
+    auto pyplan = py::list(solver.attr("solve")(p));
+    return convert_plan(pyplan);
   } catch (const std::runtime_error& e) {
-    return _solve(problem, heuristic);
+    auto p = convert_problem(problem);
+    auto pyplanner = py::module::import("pyplanner");
+    auto solver = pyplanner.attr("Solver")(heuristic);
+    auto pyplan = py::list(solver.attr("solve")(p));
+    return convert_plan(pyplan);
+  }
+}
+
+std::optional<std::vector<std::string>> solve(upf::Problem& problem)
+{
+  try {
+    py::scoped_interpreter guard{};
+    auto p = convert_problem(problem);
+    auto pyplanner = py::module::import("pyplanner");
+    auto solver = pyplanner.attr("Solver")();
+    auto pyplan = py::list(solver.attr("solve")(p));
+    return convert_plan(pyplan);
+  } catch (const std::runtime_error& e) {
+    auto p = convert_problem(problem);
+    auto pyplanner = py::module::import("pyplanner");
+    auto solver = pyplanner.attr("Solver")();
+    auto pyplan = py::list(solver.attr("solve")(p));
+    return convert_plan(pyplan);
   }
 }

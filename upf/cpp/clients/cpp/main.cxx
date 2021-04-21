@@ -49,7 +49,8 @@ int main() {
 
   std::vector<std::string>
     planners = {"/home/alvalentini/aiplan4eu/upf-poc/planners/cpp/cppplanner_cppupf.so",
-                "/home/alvalentini/aiplan4eu/upf-poc/planners/python/pyplanner_cppupf.so"};
+                "/home/alvalentini/aiplan4eu/upf-poc/planners/python/pyplanner_cppupf.so",
+                "/home/alvalentini/aiplan4eu/upf-poc/planners/java/JPlanner/grpc_cpp_client_test/jplanner_cppupf.so"};
 
   for (auto& planner : planners) {
     {

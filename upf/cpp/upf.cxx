@@ -14,7 +14,7 @@ namespace upf
       std::cerr << "Error: " << dlerror() << std::endl;
       return std::nullopt;
     }
-    void* f = dlsym(handle, "solve");
+    void* f = dlsym(handle, "solve_with_heuristic");
     if (f == 0) {
       std::cerr << "Error: " << dlerror() << std::endl;
       return std::nullopt;
@@ -29,7 +29,21 @@ namespace upf
 
   std::optional<std::vector<std::string>> solve(std::string planner, Problem problem)
   {
-    return solve(planner, problem, [](const std::set<std::string>& state){ return 0; });
+    void* handle = dlopen(planner.c_str(), RTLD_LAZY);
+    if (handle == 0) {
+      std::cerr << "Error: " << dlerror() << std::endl;
+      return std::nullopt;
+    }
+    void* f = dlsym(handle, "solve");
+    if (f == 0) {
+      std::cerr << "Error: " << dlerror() << std::endl;
+      return std::nullopt;
+    }
+    std::optional<std::vector<std::string>> (*plannersolve)(Problem&);
+    plannersolve = reinterpret_cast<std::optional<std::vector<std::string>> (*) (Problem&)>(f);
+    auto res = plannersolve(problem);
+    dlclose(handle);
+    return res;
   }
 
 }
