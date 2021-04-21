@@ -5,14 +5,18 @@
 #include <grpcpp/client_context.h>
 #include <grpcpp/create_channel.h>
 #include <grpcpp/security/credentials.h>
+#include <thread>
 
 #include "JPlannerUPF.grpc.pb.h"
 
 using grpc::Channel;
 using grpc::ClientContext;
+using grpc::ClientReaderWriter;
 using eu::aiplan4eu::jplanner::grpc::ActionMessage;
 using eu::aiplan4eu::jplanner::grpc::ProblemMessage;
+using eu::aiplan4eu::jplanner::grpc::ProblemOrHAnswer;
 using eu::aiplan4eu::jplanner::grpc::PlanMessage;
+using eu::aiplan4eu::jplanner::grpc::PlanOrHRequest;
 using eu::aiplan4eu::jplanner::grpc::JPlannerUPF;
 
 ActionMessage MakeActionMessage(const upf::Action& action)
@@ -68,6 +72,49 @@ public:
     return ConvertPlanMessage(plan_message);
   }
 
+  std::vector<std::string> solve_with_heuristic(upf::Problem& problem, std::function<double(std::set<std::string>)> heuristic)
+  {
+    ClientContext context;
+
+    std::shared_ptr<ClientReaderWriter<ProblemOrHAnswer, PlanOrHRequest> > stream(
+        stub_->solveWithHeuristic(&context));
+
+    PlanOrHRequest* r = new PlanOrHRequest();
+    std::cout << "!!" << std::endl;
+    std::thread writer([stream](upf::Problem p,
+                                std::function<double(std::set<std::string>)> fun,
+                                PlanOrHRequest* request) {
+        std::cout << "??" << std::endl;
+        ProblemOrHAnswer answer;
+        answer.mutable_problem()->CopyFrom(MakeProblemMessage(p));
+        stream->Write(answer);
+        while (stream->Read(request)) {
+          if (request->has_plan()) {
+            break;
+          }
+          auto state_message = request->statetoevaluate();
+          std::set<std::string> state;
+          for (int i=0; i<state_message.state_size(); i++) {
+            auto p = state_message.state(i);
+            state.insert(p);
+            std::cout << p << std::endl;
+          }
+          ProblemOrHAnswer response;
+          response.set_stateevaluation(fun(state));
+          stream->Write(response);
+        }
+        stream->WritesDone();
+        std::cout << "++" << std::endl;
+    }, problem, heuristic, r);
+    writer.join();
+    std::cout << "--" << std::endl;
+
+    if (r->has_plan()) {
+      return ConvertPlanMessage(r->plan());
+    }
+    return {};
+  }
+
 private:
   std::unique_ptr<JPlannerUPF::Stub> stub_;
 };
@@ -83,5 +130,9 @@ std::optional<std::vector<std::string>> solve(upf::Problem& problem)
 
 std::optional<std::vector<std::string>> solve_with_heuristic(upf::Problem& problem, std::function<double(std::set<std::string>)> heuristic)
 {
-  return std::nullopt;
+  JPlannerUPFClient client(
+      grpc::CreateChannel("localhost:50051",
+                          grpc::InsecureChannelCredentials()));
+
+  return client.solve_with_heuristic(problem, heuristic);
 }

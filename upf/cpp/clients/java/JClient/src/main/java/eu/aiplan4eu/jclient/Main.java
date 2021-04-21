@@ -44,7 +44,7 @@ public class Main {
                 // System.out.println(planner + " with heuristic:");
                 // List<String> plan2 = client.solve(problem, new Heuristic(problem.getGoal()), planner);
                 // System.out.println(plan2);
-                // System.out.println();
+                System.out.println();
             }
         } finally {
             channel.shutdownNow().awaitTermination(5, TimeUnit.SECONDS);
