@@ -47,4 +47,49 @@ cd ${DIR}
 
 
 kill -9 ${UPF_SERVER_PID}
+
+
+echo "--------------------------------------------------------------------------------"
+echo "|  C++ UPF                                                                  |"
+echo "--------------------------------------------------------------------------------"
+
+cd ${DIR}/upf/cpp
+echo " -> Compiling the UPF..."
+bash compile_upf.sh &> /dev/null
+echo "    Done."
+
+echo " -> Launching C++ UPF Server..."
+cd ${DIR}/upf/cpp/clients/java/JClient/grpc_server_test
+echo " -> Compiling..."
+bash compile_jclient.sh &> /dev/null
+echo "    Done."
+bash run.sh &
+UPF_SERVER_PID=$!
+sleep 1
+cd ${DIR}
+
+echo ""
+echo "TSB written in Python"
+echo "---------------------"
+bash upf/cpp/clients/python/run.sh
+
+echo ""
+echo "TSB written in Java"
+echo "-------------------"
+cd ${DIR}/upf/cpp/clients/java/JClient
+./gradlew --console plain -q runClient
+cd ${DIR}
+
+echo ""
+echo "TSB written in C++"
+echo "------------------"
+echo " -> Compiling..."
+cd ${DIR}/upf/cpp/clients/cpp
+bash compile.sh &> /dev/null
+echo "    Done."
+bash run.sh
+cd ${DIR}
+
+
+kill -9 ${UPF_SERVER_PID}
 kill -9 ${JAVA_SERVER_PID}

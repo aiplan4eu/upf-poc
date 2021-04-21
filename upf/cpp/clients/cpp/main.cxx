@@ -43,14 +43,12 @@ upf::Problem generate_problem(size_t size)
 }
 
 int main() {
-  size_t size = 15;
+  size_t size = 14;
 
   auto problem = generate_problem(size);
 
   std::vector<std::string>
-    planners = {"/home/alvalentini/aiplan4eu/upf-poc/planners/cpp/cppplanner_cppupf.so",
-                "/home/alvalentini/aiplan4eu/upf-poc/planners/python/pyplanner_cppupf.so",
-                "/home/alvalentini/aiplan4eu/upf-poc/planners/java/JPlanner/grpc_cpp_client_test/jplanner_cppupf.so"};
+    planners = {"cppplanner_cppupf.so", "pyplanner_cppupf.so", "jplanner_cppupf.so"};
 
   for (auto& planner : planners) {
     {
@@ -70,8 +68,7 @@ int main() {
       auto now = std::chrono::steady_clock::now();
       auto duration
         = std::chrono::duration_cast<std::chrono::milliseconds>(now - clock);
-      double elapsed = (double)duration.count() / 1000.0;
-      std::cout << "Planning with no heuristic: " << elapsed << std::endl;
+      std::cout << planner << " with no heuristic: " << duration.count() << "ms" << std::endl;
     }
 
     {
@@ -91,8 +88,7 @@ int main() {
       auto now = std::chrono::steady_clock::now();
       auto duration
         = std::chrono::duration_cast<std::chrono::milliseconds>(now - clock);
-      double elapsed = (double)duration.count() / 1000.0;
-      std::cout << "Planning with heuristic: " << elapsed << std::endl;
+      std::cout << planner << " with heuristic: " << duration.count() << "ms" << std::endl;
     }
   }
 

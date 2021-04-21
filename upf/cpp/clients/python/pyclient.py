@@ -35,13 +35,11 @@ class GoalCounterHeuristic:
 
 
 def main():
-    size = 15
+    size = 14
 
     problem = generate_problem(size)
 
-    planners = ["/home/alvalentini/aiplan4eu/upf-poc/planners/cpp/cppplanner_cppupf.so",
-                "/home/alvalentini/aiplan4eu/upf-poc/planners/python/pyplanner_cppupf.so",
-                "/home/alvalentini/aiplan4eu/upf-poc/planners/java/JPlanner/grpc_cpp_client_test/jplanner_cppupf.so"]
+    planners = ["cppplanner_cppupf.so", "pyplanner_cppupf.so", "jplanner_cppupf.so"]
     for name in planners:
         with Timing("%s with no heuristic" % name):
             plan = upf.solve(name, problem)

@@ -27,24 +27,26 @@ public class Main {
     }
 
     public static void main(String[] args) throws InterruptedException {
-        Problem problem = generateProblem(15);
+        Problem problem = generateProblem(14);
 
-        List<String> planners = List.of("/home/alvalentini/aiplan4eu/upf-poc/planners/cpp/cppplanner_cppupf.so",
-                                        "/home/alvalentini/aiplan4eu/upf-poc/planners/python/pyplanner_cppupf.so",
-                                        "/home/alvalentini/aiplan4eu/upf-poc/planners/java/JPlanner/grpc_cpp_client_test/jplanner_cppupf.so");
+        List<String> planners = List.of("cppplanner_cppupf.so", "pyplanner_cppupf.so", "jplanner_cppupf.so");
 
         String target = "localhost:50052";
         ManagedChannel channel = ManagedChannelBuilder.forTarget(target).usePlaintext().build();
         try {
             GRPCClient client = new GRPCClient(channel);
             for (String planner : planners) {
-                System.out.println(planner + " with no heuristic:");
+                long begin = System.currentTimeMillis();
                 List<String> plan1 = client.solve(problem, planner);
+                long end = System.currentTimeMillis();
                 System.out.println(plan1);
-                System.out.println(planner + " with heuristic:");
+                System.out.println(planner + " with no heuristic: " + (end - begin) + "ms");
+
+                begin = System.currentTimeMillis();
                 List<String> plan2 = client.solve(problem, new Heuristic(problem.getGoal()), planner);
+                end = System.currentTimeMillis();
                 System.out.println(plan2);
-                System.out.println();
+                System.out.println(planner + " with heuristic: " + (end - begin) + "ms");
             }
         } finally {
             channel.shutdownNow().awaitTermination(5, TimeUnit.SECONDS);
