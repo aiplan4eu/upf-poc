@@ -4,9 +4,9 @@ option java_multiple_files = true;
 option java_package = "eu.aiplan4eu.jclient.grpc";
 option java_outer_classname = "JClientGRPC";
 
-package eu.aiplan4eu.jclient.grpc;
+package eu.aiplan4eu.upf.grpc;
 
-service JClientUPF {
+service UPF {
   rpc solve (ProblemMessage) returns (PlanMessage) {}
   rpc solveWithHeuristic (stream ProblemOrHAnswer) returns (stream PlanOrHRequest) {}
 }

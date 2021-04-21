@@ -16,12 +16,12 @@ public class GRPCClient {
 
     private static final Logger logger = Logger.getLogger(GRPCClient.class.getName());
 
-    private final JClientUPFGrpc.JClientUPFBlockingStub blockingStub;
-    private final JClientUPFGrpc.JClientUPFStub asyncStub;
+    private final UPFGrpc.UPFBlockingStub blockingStub;
+    private final UPFGrpc.UPFStub asyncStub;
 
     public GRPCClient(Channel channel) {
-        blockingStub = JClientUPFGrpc.newBlockingStub(channel);
-        asyncStub = JClientUPFGrpc.newStub(channel);
+        blockingStub = UPFGrpc.newBlockingStub(channel);
+        asyncStub = UPFGrpc.newStub(channel);
     }
 
     private ProblemMessage encode(Problem problem, String planner) {

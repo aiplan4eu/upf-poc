@@ -17,9 +17,9 @@ public class Main {
         actions.add(a2);
         Set<String> goal = new HashSet<>();
         for (int i = 0; i < size; i++) {
-            String name = "v"+i;
+            String name = "v" + i;
             goal.add(name);
-            Action a = new Action("mk_"+name, Collections.singleton("y"), Collections.singleton(name), Collections.singleton("y"));
+            Action a = new Action("mk_" + name, Collections.singleton("y"), Collections.singleton(name), Collections.singleton("y"));
             actions.add(a);
         }
         Problem problem = new Problem(actions, Collections.singleton("x"), goal);
@@ -27,7 +27,7 @@ public class Main {
     }
 
     public static void main(String[] args) throws InterruptedException {
-        Problem problem = generateProblem(10);
+        Problem problem = generateProblem(14);
 
         List<String> planners = List.of("pyplanner_upf", "cppplanner_upf", "jplanner_upf");
 
@@ -36,16 +36,20 @@ public class Main {
         try {
             GRPCClient client = new GRPCClient(channel);
             for (String planner : planners) {
-                System.out.println(planner + " with no heuristic:");
+                long begin = System.currentTimeMillis();
                 List<String> plan1 = client.solve(problem, planner);
+                long end = System.currentTimeMillis();
                 System.out.println(plan1);
-                System.out.println(planner + " with heuristic:");
+                System.out.println(planner + " with no heuristic: " + (end - begin) + "ms");
+
+                begin = System.currentTimeMillis();
                 List<String> plan2 = client.solve(problem, new Heuristic(problem.getGoal()), planner);
+                end = System.currentTimeMillis();
                 System.out.println(plan2);
-                System.out.println();
+                System.out.println(planner + " with heuristic: " + (end - begin) + "ms");
             }
         } finally {
-            channel.shutdownNow().awaitTermination(5, TimeUnit.SECONDS);
+            channel.shutdownNow().awaitTermination(20, TimeUnit.SECONDS);
         }
     }
 

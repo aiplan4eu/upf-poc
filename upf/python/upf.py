@@ -29,7 +29,7 @@ class Solver():
 class LinkedSolver(Solver):
     def __init__(self, module_name):
         self.module = importlib.import_module(module_name)
-        print('Creating planner %s' % module_name)
+        #print('Creating planner %s' % module_name)
 
     def solve(self, problem: Problem, heuristic: Callable[[FrozenSet[str]], float] = None) -> List[str]:
         if heuristic is None:
@@ -39,7 +39,7 @@ class LinkedSolver(Solver):
         return plan
 
     def destroy(self):
-        print("Linked Solver destroyed")
+        pass
 
 from contextlib import contextmanager
 

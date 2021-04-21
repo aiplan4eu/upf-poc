@@ -73,7 +73,7 @@ int main() {
 
   auto upf = py::module::import("upf");
 
-  size_t size = 15;
+  size_t size = 14;
 
   auto problem = generate_problem(upf, size);
 
@@ -86,12 +86,9 @@ int main() {
       auto clock = std::chrono::steady_clock::now();
       auto plan = upf_planner.attr("solve")(problem);
       auto now = std::chrono::steady_clock::now();
-      auto duration
-        = std::chrono::duration_cast<std::chrono::milliseconds>(
-                                                                now - clock);
-      double elapsed = (double)duration.count() / 1000.0;
+      auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(now - clock);
       py::print(plan);
-      std::cout << "Planning with no heuristic: " << elapsed << std::endl;
+      std::cout << planner_name << " with no heuristic: " << duration.count() << "ms" << std::endl;
     }
 
     {
@@ -99,12 +96,9 @@ int main() {
       auto clock = std::chrono::steady_clock::now();
       auto plan = upf_planner.attr("solve")(problem, my_heuristic.attr("Heuristic")(size, problem.attr("goal")).attr("compute"));
       auto now = std::chrono::steady_clock::now();
-      auto duration
-        = std::chrono::duration_cast<std::chrono::milliseconds>(
-                                                                now - clock);
-      double elapsed = (double)duration.count() / 1000.0;
+      auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(now - clock);
       py::print(plan);
-      std::cout << "Planning with heuristic: " << elapsed << std::endl;
+      std::cout << planner_name << " with heuristic: " << duration.count() << "ms" << std::endl;
     }
   }
 

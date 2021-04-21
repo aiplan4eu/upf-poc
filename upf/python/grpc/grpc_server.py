@@ -5,14 +5,14 @@ import threading
 import queue
 import upf
 
-from JClientUPF_pb2 import PlanMessage, PlanOrHRequest, State
-import JClientUPF_pb2_grpc
+from UPF_pb2 import PlanMessage, PlanOrHRequest, State
+import UPF_pb2_grpc
 
 
-class JClientUPFServicer(JClientUPF_pb2_grpc.JClientUPFServicer):
+class UPFServicer(UPF_pb2_grpc.UPFServicer):
 
     def __init__(self):
-        JClientUPF_pb2_grpc.JClientUPFServicer.__init__(self)
+        UPF_pb2_grpc.UPFServicer.__init__(self)
         self.lock = threading.Lock()
         self.lock.acquire() # Start acquired!
         self.state_evaluation = None
@@ -66,8 +66,7 @@ class JClientUPFServicer(JClientUPF_pb2_grpc.JClientUPFServicer):
 
 def serve():
   server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
-  JClientUPF_pb2_grpc.add_JClientUPFServicer_to_server(
-      JClientUPFServicer(), server)
+  UPF_pb2_grpc.add_UPFServicer_to_server(UPFServicer(), server)
   server.add_insecure_port('[::]:50052')
   server.start()
   server.wait_for_termination()

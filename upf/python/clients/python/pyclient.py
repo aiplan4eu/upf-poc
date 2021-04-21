@@ -34,7 +34,7 @@ class GoalCounterHeuristic:
 
 
 def main():
-    size = 15
+    size = 14
 
     problem = generate_problem(size)
 
