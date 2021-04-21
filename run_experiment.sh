@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
 
@@ -50,7 +52,7 @@ kill -9 ${UPF_SERVER_PID}
 
 
 echo "--------------------------------------------------------------------------------"
-echo "|  C++ UPF                                                                  |"
+echo "|  C++ UPF                                                                     |"
 echo "--------------------------------------------------------------------------------"
 
 cd ${DIR}/upf/cpp
@@ -68,9 +70,20 @@ UPF_SERVER_PID=$!
 sleep 1
 cd ${DIR}
 
+echo " -> Compiling Planner Wrappers..."
+echo "    - C++"
+bash ${DIR}/planners/cpp/compile_cppwrapper.sh
+echo "    - Python"
+bash ${DIR}/planners/python/compile_cppwrapper.sh
+echo "    - Java"
+bash ${DIR}/planners/java/JPlanner/grpc_cpp_client_test/build_grpc.sh
+bash ${DIR}/planners/java/JPlanner/grpc_cpp_client_test/compile_cppwrapper.sh
+echo "    Done."
+
 echo ""
 echo "TSB written in Python"
 echo "---------------------"
+bash upf/cpp/clients/python/compile_pywrapper.sh
 bash upf/cpp/clients/python/run.sh
 
 echo ""
