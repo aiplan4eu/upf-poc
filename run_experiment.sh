@@ -55,7 +55,7 @@ bash run.sh
 cd ${DIR}
 
 
-kill -9 ${UPF_SERVER_PID}
+pkill -P ${UPF_SERVER_PID}; kill -9 ${UPF_SERVER_PID}
 sleep 1
 
 
@@ -111,6 +111,5 @@ echo "    Done."
 bash run.sh
 cd ${DIR}
 
-
-kill -9 ${UPF_SERVER_PID}
+pkill -P ${UPF_SERVER_PID}; kill -9 ${UPF_SERVER_PID}
 kill -9 ${JAVA_SERVER_PID}
