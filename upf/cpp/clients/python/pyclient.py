@@ -39,7 +39,7 @@ def main():
 
     problem = generate_problem(size)
 
-    planners = ["cppplanner_cppupf.so", "pyplanner_cppupf.so", "jplanner_cppupf.so"]
+    planners = ["cppplanner_upf.so", "pyplanner_upf.so", "jplanner_upf.so"]
     for name in planners:
         with Timing("%s with no heuristic" % name):
             plan = upf.solve(name, problem)

@@ -48,7 +48,7 @@ int main() {
   auto problem = generate_problem(size);
 
   std::vector<std::string>
-    planners = {"cppplanner_cppupf.so", "pyplanner_cppupf.so", "jplanner_cppupf.so"};
+    planners = {"cppplanner_upf.so", "pyplanner_upf.so", "jplanner_upf.so"};
 
   for (auto& planner : planners) {
     {

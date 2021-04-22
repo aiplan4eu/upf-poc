@@ -2,7 +2,7 @@
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
-export PYTHONPATH="${PYTHONPATH}:${DIR}/../../../../planners/python"
-export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${DIR}/../../../../planners/python:${DIR}/../../../../planners/cpp:${DIR}/../../../../planners/java/JPlanner/grpc_cpp_client"
+export PYTHONPATH="${PYTHONPATH}:${DIR}/../../../../planners/python:${DIR}/../../../../planners/python/cpp_upf_wrapper"
+export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${DIR}/../../../../planners/python/cpp_upf_wrapper:${DIR}/../../../../planners/cpp/cpp_upf_wrapper:${DIR}/../../../../planners/java/grpc_cpp_client"
 
 python3 ${DIR}/pyclient.py
