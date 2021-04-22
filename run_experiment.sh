@@ -25,6 +25,13 @@ UPF_SERVER_PID=$!
 sleep 1
 cd ${DIR}
 
+echo " -> Compiling Planner Wrappers..."
+echo "    - C++"
+bash ${DIR}/planners/cpp/compile_pywrapper.sh
+echo "    - Java"
+bash ${DIR}/planners/java/JPlanner/grpc_client_test/build_grpc.sh
+echo "    Done."
+
 echo ""
 echo "TSB written in Python"
 echo "---------------------"
@@ -49,6 +56,7 @@ cd ${DIR}
 
 
 kill -9 ${UPF_SERVER_PID}
+sleep 1
 
 
 echo "--------------------------------------------------------------------------------"
