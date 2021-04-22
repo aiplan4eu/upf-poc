@@ -4,7 +4,7 @@
 #include <grpcpp/server_context.h>
 #include <grpcpp/security/server_credentials.h>
 
-#include "JClientUPF.grpc.pb.h"
+#include "UPF.grpc.pb.h"
 
 #include "upf.hxx"
 
@@ -15,13 +15,13 @@ using grpc::ServerReader;
 using grpc::ServerReaderWriter;
 using grpc::ServerWriter;
 using grpc::Status;
-using eu::aiplan4eu::jclient::grpc::ActionMessage;
-using eu::aiplan4eu::jclient::grpc::ProblemMessage;
-using eu::aiplan4eu::jclient::grpc::ProblemOrHAnswer;
-using eu::aiplan4eu::jclient::grpc::PlanMessage;
-using eu::aiplan4eu::jclient::grpc::PlanOrHRequest;
-using eu::aiplan4eu::jclient::grpc::State;
-using eu::aiplan4eu::jclient::grpc::JClientUPF;
+using eu::aiplan4eu::upf::grpc::ActionMessage;
+using eu::aiplan4eu::upf::grpc::ProblemMessage;
+using eu::aiplan4eu::upf::grpc::ProblemOrHAnswer;
+using eu::aiplan4eu::upf::grpc::PlanMessage;
+using eu::aiplan4eu::upf::grpc::PlanOrHRequest;
+using eu::aiplan4eu::upf::grpc::State;
+using eu::aiplan4eu::upf::grpc::UPF;
 
 upf::Action ConvertActionMessage(const ActionMessage& action_message)
 {
@@ -59,7 +59,7 @@ upf::Problem ConvertProblemMessage(const ProblemMessage& problem_message)
   return problem;
 }
 
-class JClientUPFImpl final : public JClientUPF::Service {
+class UPFImpl final : public UPF::Service {
  public:
 
   Status solve(ServerContext* context, const ProblemMessage* request, PlanMessage* response)
@@ -106,7 +106,7 @@ class JClientUPFImpl final : public JClientUPF::Service {
 
 int main() {
   std::string server_address("localhost:50052");
-  JClientUPFImpl service;
+  UPFImpl service;
 
   ServerBuilder builder;
   builder.AddListeningPort(server_address, grpc::InsecureServerCredentials());

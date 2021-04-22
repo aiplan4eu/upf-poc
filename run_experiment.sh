@@ -29,7 +29,7 @@ echo " -> Compiling Planner Wrappers..."
 echo "    - C++"
 bash ${DIR}/planners/cpp/compile_pywrapper.sh
 echo "    - Java"
-bash ${DIR}/planners/java/JPlanner/grpc_client_test/build_grpc.sh
+bash ${DIR}/planners/java/JPlanner/grpc_pyclient/build_grpc.sh
 echo "    Done."
 
 echo ""
@@ -69,9 +69,9 @@ bash compile_upf.sh &> /dev/null
 echo "    Done."
 
 echo " -> Launching C++ UPF Server..."
-cd ${DIR}/upf/cpp/clients/java/JClient/grpc_server_test
+cd ${DIR}/upf/cpp/grpc
 echo " -> Compiling..."
-bash compile_jclient.sh &> /dev/null
+bash compile_grpc_server.sh &> /dev/null
 echo "    Done."
 bash run.sh &
 UPF_SERVER_PID=$!
@@ -84,8 +84,8 @@ bash ${DIR}/planners/cpp/compile_cppwrapper.sh
 echo "    - Python"
 bash ${DIR}/planners/python/compile_cppwrapper.sh
 echo "    - Java"
-bash ${DIR}/planners/java/JPlanner/grpc_cpp_client_test/build_grpc.sh
-bash ${DIR}/planners/java/JPlanner/grpc_cpp_client_test/compile_cppwrapper.sh
+bash ${DIR}/planners/java/JPlanner/grpc_cpp_client/build_grpc.sh
+bash ${DIR}/planners/java/JPlanner/grpc_cpp_client/compile_cppwrapper.sh
 echo "    Done."
 
 echo ""
