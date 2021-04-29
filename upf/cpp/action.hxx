@@ -9,6 +9,8 @@ namespace upf
   class Action
   {
   public:
+    Action() {}
+
     Action(const std::string& name,
            const std::set<std::string>& precondition,
            const std::set<std::string>& positive_effect,
