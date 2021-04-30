@@ -52,22 +52,22 @@ class Main {
         public GoalCounter(UPF.StringSet goals) {
             this.goals = new HashSet<>();
             for (UPF.StringSet.Iterator it = goals.begin(); !it.equals(goals.end()); it.increment()) {
-                this.goals.add(it.get().getString());
+                this.goals.add(it.get());
             }
         }
 
         @Override
-        public double apply(@ByVal UPF.StringSet state) {
-            double res = this.goals.size();
-            for (UPF.StringSet.Iterator it = state.begin(); !it.equals(state.end()); it.increment()) {
-                if (this.goals.contains(it.get().getString())) {
+        public double apply(@Const @ByRef UPF.StringSet state) {
+            double res = goals.size();
+            for (BytePointer x : goals) {
+                if (UPF.set_contains(state, x)) {
                     res -= 1;
                 }
             }
             return res;
         }
 
-        private Set<String> goals;
+        private Set<BytePointer> goals;
 
     }
 

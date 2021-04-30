@@ -12,7 +12,7 @@ namespace jupf
 
   class Heuristic {
   public:
-    virtual double operator()(std::set<std::string> s)
+    virtual double operator()(const std::set<std::string>& s)
     {
       return 0;
     }
@@ -23,5 +23,7 @@ namespace jupf
   std::optional<std::vector<std::string>> solve(std::string planner, upf::Problem problem, Heuristic& h);
 
   std::optional<std::vector<std::string>> solve(std::string planner, upf::Problem problem);
+
+  bool set_contains(const std::set<std::string>& s, const std::string& x);
 
 }
