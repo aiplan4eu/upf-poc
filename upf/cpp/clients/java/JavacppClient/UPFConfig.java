@@ -5,7 +5,7 @@ import org.bytedeco.javacpp.tools.*;
 @Properties(
     value = @Platform(
         includepath = {"./", "../../../"},
-        include = {"jupf.hxx", "problem.hxx", "action.hxx"},
+        include = {"jupf.hxx", "upf.hxx", "problem.hxx", "action.hxx"},
         linkpath = {"./"},
         link = {"jupf"},
         compiler={"cpp17"}
@@ -21,5 +21,7 @@ public class UPFConfig implements InfoMapper {
         infoMap.put(new Info("std::vector<Action>").pointerTypes("ActionVector"));
         infoMap.put(new Info("std::optional<std::vector<std::string> >").pointerTypes("OptionalStringVector").define());
         infoMap.put(new Info("jupf::Heuristic").virtualize());
+        // All std::function<> need to be wrapped in a special way
+        infoMap.put(new Info("upf.hxx").linePatterns(".*?std::function.*?").skip());
     }
 }
