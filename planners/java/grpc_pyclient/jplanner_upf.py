@@ -2,7 +2,7 @@ import grpc
 import threading
 from contextlib import contextmanager
 from time import time
-
+import queue
 
 from dataclasses import dataclass
 from typing import Iterable
@@ -19,42 +19,19 @@ def timing(description: str) -> None:
     print(f"{description}: {elapsed_time}ms")
 
 
-@dataclass
-class StateContainer():
-    state: Iterable[str]
+class StreamStreamWrapper():
+    def __init__(self, method):
+        self.request_queue = queue.SimpleQueue()
+        self.responses = method(iter(self.request_queue.get, None))
 
-def HIterator(problem_message, lock, state_container, heuristic):
-    try:
-        yield ProblemOrHAnswer(problem=problem_message)
-        while True:
-            lock.acquire()
-            state = state_container.state
-            if state is None:
-                break
-            res = heuristic(frozenset(state))
-            #print(res)
-            yield ProblemOrHAnswer(stateEvaluation=res)
-        return
-    except Exception as e:
-        print(e)
+    def write(self, x):
+        self.request_queue.put(x)
 
+    def close(self):
+        self.request_queue.put(None)
 
-def _do_solve_with_h(stub, problem_message, heuristic):
-    lock = threading.Lock()
-    lock.acquire();
-    state_container = StateContainer(None)
-    it = HIterator(problem_message, lock, state_container, heuristic)
-    responses = stub.solveWithHeuristic(it)
-    for response in responses:
-        if response.HasField('stateToEvaluate'):
-            state_container.state = response.stateToEvaluate.state
-            #print(state_container.state)
-            lock.release()
-        else:
-            state_container.state = None
-            lock.release()
-            return response.plan
-
+    def read(self):
+        return next(self.responses)
 
 
 def _upf_action_to_grpc(action):
@@ -67,12 +44,23 @@ def _upf_problem_to_grpc(problem):
     actions = [_upf_action_to_grpc(x) for x in problem.actions]
     return ProblemMessage(actions=actions, init=problem.init, goal=problem.goal)
 
+
 def solve(problem):
     with grpc.insecure_channel('localhost:50051') as channel:
         stub = JPlannerUPFStub(channel)
         return list(stub.solve(_upf_problem_to_grpc(problem)).actions)
 
-def solve_with_heuristic(problem, h):
+
+def solve_with_heuristic(problem, heuristic):
     with grpc.insecure_channel('localhost:50051') as channel:
         stub = JPlannerUPFStub(channel)
-        return list(_do_solve_with_h(stub, _upf_problem_to_grpc(problem), h).actions)
+        ssw = StreamStreamWrapper(stub.solveWithHeuristic)
+        ssw.write(ProblemOrHAnswer(problem=_upf_problem_to_grpc(problem)))
+        while True:
+            response = ssw.read()
+            if response.HasField('stateToEvaluate'):
+                state = frozenset(response.stateToEvaluate.state)
+                ssw.write(ProblemOrHAnswer(stateEvaluation=heuristic(state)))
+            else:
+                ssw.close()
+                return response.plan.actions
