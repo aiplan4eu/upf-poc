@@ -7,6 +7,42 @@
 namespace upf
 {
 
+  void init(std::string planner)
+  {
+    void* handle = dlopen(planner.c_str(), RTLD_LAZY);
+    if (handle == 0) {
+      std::cerr << "Error: " << dlerror() << std::endl;
+      return;
+    }
+    void* f = dlsym(handle, "init");
+    if (f == 0) {
+      std::cerr << "Error: " << dlerror() << std::endl;
+      return;
+    }
+    void (*plannerinit)();
+    plannerinit = reinterpret_cast<void (*) ()>(f);
+    plannerinit();
+    dlclose(handle);
+  }
+
+  void uninit(std::string planner)
+  {
+    void* handle = dlopen(planner.c_str(), RTLD_LAZY);
+    if (handle == 0) {
+      std::cerr << "Error: " << dlerror() << std::endl;
+      return;
+    }
+    void* f = dlsym(handle, "uninit");
+    if (f == 0) {
+      std::cerr << "Error: " << dlerror() << std::endl;
+      return;
+    }
+    void (*planneruninit)();
+    planneruninit = reinterpret_cast<void (*) ()>(f);
+    planneruninit();
+    dlclose(handle);
+  }
+
   std::optional<std::vector<std::string>> solve(std::string planner, Problem problem, std::function<double(std::set<std::string>)> heuristic)
   {
     void* handle = dlopen(planner.c_str(), RTLD_LAZY);

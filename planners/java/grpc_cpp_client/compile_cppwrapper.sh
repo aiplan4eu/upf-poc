@@ -11,6 +11,6 @@ g++ -O3 -c -fPIC -Wall -Werror -std=c++17 ${DIR}/../../../upf/cpp/problem.cxx -o
 g++ -O3 -c -fPIC -Wall -Werror -std=c++17 -I${HOME}/.local/include ${DIR}/JPlannerUPF.grpc.pb.cc -L${HOME}/.local/lib `pkg-config --libs protobuf grpc++` -lgrpc++_reflection -ldl -o ${DIR}/JPlannerUPF.grpc.pb.o
 g++ -O3 -c -fPIC -Wall -Werror -std=c++17 -I${HOME}/.local/include ${DIR}/JPlannerUPF.pb.cc -L${HOME}/.local/lib `pkg-config --libs protobuf grpc++` -lgrpc++_reflection -ldl -o ${DIR}/JPlannerUPF.pb.o
 
-g++ -O3 -shared -fPIC -Wall -std=c++17 -I${HOME}/.local/include -I${DIR}/ -I${DIR}/../../../upf/cpp ${DIR}/jplanner_upf.cxx ${DIR}/JPlannerUPF.grpc.pb.o ${DIR}/JPlannerUPF.pb.o ${DIR}/action.o ${DIR}/problem.o -L${HOME}/.local/lib `pkg-config --libs protobuf grpc++` -lgrpc++_reflection -lpthread -ldl -o ${DIR}/jplanner_upf.so
+g++ -O3 -shared -fPIC -Wall -std=c++17 -I${HOME}/.local/include -I${DIR}/ -I${DIR}/../../../upf/cpp ${DIR}/jplanner_upf.cxx ${DIR}/JPlannerUPF.grpc.pb.o ${DIR}/JPlannerUPF.pb.o ${DIR}/action.o ${DIR}/problem.o -L${HOME}/.local/lib `pkg-config --libs protobuf grpc++` -lgrpc++_reflection -lpthread -ldl -o ${DIR}/jplanner_upf_grpc.so
 
 rm ${DIR}/*.o

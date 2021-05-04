@@ -27,6 +27,12 @@ PYBIND11_MODULE(_pywrapper_upf, m) {
       .def_property_readonly("init", &upf::Problem::init)
       .def_property_readonly("goal", &upf::Problem::goal);
 
+    m.def("init", py::overload_cast<std::string>(&upf::init),
+          "Initializes the planner");
+
+    m.def("uninit", py::overload_cast<std::string>(&upf::uninit),
+          "Uninitializes the planner");
+
     m.def("solve",
           py::overload_cast<std::string, upf::Problem>(&upf::solve),
           "Solves a problem without heuristic");

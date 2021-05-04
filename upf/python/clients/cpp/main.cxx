@@ -77,7 +77,7 @@ int main() {
 
   auto problem = generate_problem(upf, size);
 
-  std::vector<std::string> planners = {"cppplanner_upf", "pyplanner_upf", "jplanner_upf"};
+  std::vector<std::string> planners = {"cppplanner_upf", "pyplanner_upf", "jplanner_upf", "jplanner_upf_grpc"};
 
   for (auto& planner_name : planners) {
     auto upf_planner = upf.attr("LinkedSolver")(planner_name);

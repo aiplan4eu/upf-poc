@@ -38,7 +38,7 @@ def main():
 
     problem = generate_problem(size)
 
-    planners = ['cppplanner_upf', 'pyplanner_upf', 'jplanner_upf']
+    planners = ['cppplanner_upf', 'pyplanner_upf', 'jplanner_upf', 'jplanner_upf_grpc']
     for name in planners:
         with upf.Planner(name) as p:
             with Timing("%s with no heuristic" % name):

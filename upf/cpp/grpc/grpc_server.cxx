@@ -64,7 +64,12 @@ class UPFImpl final : public UPF::Service {
 
   Status solve(ServerContext* context, const ProblemMessage* request, PlanMessage* response)
   {
-    if (auto plan = upf::solve(request->planner(), ConvertProblemMessage(*request))) {
+    auto p = request->planner();
+    if (planners_.find(p) == planners_.end()) {
+      upf::init(p);
+      planners_.insert(p);
+    }
+    if (auto plan = upf::solve(p, ConvertProblemMessage(*request))) {
       for (auto& s : *plan) {
         response->add_actions(s);
       }
@@ -89,7 +94,12 @@ class UPFImpl final : public UPF::Service {
                stream->Read(&response);
                return response.stateevaluation();
              };
-    if (auto plan = upf::solve(problem.problem().planner(), ConvertProblemMessage(problem.problem()), h)) {
+    auto p = problem.problem().planner();
+    if (planners_.find(p) == planners_.end()) {
+      upf::init(p);
+      planners_.insert(p);
+    }
+    if (auto plan = upf::solve(p, ConvertProblemMessage(problem.problem()), h)) {
       PlanOrHRequest response;
       PlanMessage message;
       for (auto& s : *plan) {
@@ -100,6 +110,16 @@ class UPFImpl final : public UPF::Service {
     }
     return Status::OK;
   }
+
+  ~UPFImpl()
+  {
+    for (auto& p : planners_) {
+      upf::uninit(p);
+    }
+  }
+
+private:
+  std::set<std::string> planners_;
 
 };
 

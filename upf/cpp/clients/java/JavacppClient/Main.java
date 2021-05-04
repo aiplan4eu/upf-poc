@@ -76,9 +76,10 @@ class Main {
 
         GoalCounter h = new GoalCounter(p.goal());
 
-        List<String> planners = List.of("cppplanner_upf.so", "pyplanner_upf.so", "jplanner_upf.so");
+        List<String> planners = List.of("cppplanner_upf.so", "pyplanner_upf.so", "jplanner_upf.so", "jplanner_upf_grpc.so");
 
         for (String planner : planners) {
+            UPF.init(planner);
             long begin = System.currentTimeMillis();
             UPF.StringVector res1 = UPF.solve(planner, p).get();
             long end = System.currentTimeMillis();
@@ -98,6 +99,7 @@ class Main {
             }
             System.out.println(plan2);
             System.out.println(planner + " with heuristic: " + (end - begin) + "ms");
+            UPF.uninit(planner);
         }
 
     }

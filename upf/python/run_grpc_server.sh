@@ -2,6 +2,6 @@
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
-export PYTHONPATH="${PYTHONPATH}:${DIR}/../../planners/python:${DIR}/../../planners/python/py_upf_wrapper:${DIR}/../../planners/cpp/py_upf_wrapper:${DIR}/../../planners/java/py_upf_wrapper"
+export PYTHONPATH="${PYTHONPATH}:${DIR}/../../planners/python:${DIR}/../../planners/python/py_upf_wrapper:${DIR}/../../planners/cpp/py_upf_wrapper:${DIR}/../../planners/java/grpc_pyclient:${DIR}/../../planners/java/py_upf_wrapper"
 
 python3 ${DIR}/grpc/grpc_server.py

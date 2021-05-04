@@ -38,7 +38,7 @@ echo "---------------------"
 bash upf/python/clients/python/run.sh
 
 echo ""
-echo "TSB written in Java"
+echo "TSB written in Java via GRPC"
 echo "-------------------"
 cd ${DIR}/upf/python/clients/java/JClient
 ./gradlew --console plain -q runClient
@@ -86,6 +86,9 @@ bash ${DIR}/planners/python/cpp_upf_wrapper/compile_cppwrapper.sh
 echo "    - Java"
 bash ${DIR}/planners/java/grpc_cpp_client/build_grpc.sh
 bash ${DIR}/planners/java/grpc_cpp_client/compile_cppwrapper.sh
+cd ${DIR}/planners/java/cpp_upf_wrapper
+bash compile.sh
+cd ${DIR}
 echo "    Done."
 
 echo ""
@@ -95,10 +98,20 @@ bash upf/cpp/clients/python/compile_pywrapper.sh
 bash upf/cpp/clients/python/run.sh
 
 echo ""
-echo "TSB written in Java"
+echo "TSB written in Java via GRPC"
 echo "-------------------"
 cd ${DIR}/upf/cpp/clients/java/JClient
 ./gradlew --console plain -q runClient
+cd ${DIR}
+
+echo ""
+echo "TSB written in Java"
+echo "-------------------"
+cd ${DIR}/upf/cpp/clients/java/JavacppClient
+echo " -> Compiling..."
+bash compile_jupf.sh &> /dev/null
+echo "    Done."
+bash run.sh
 cd ${DIR}
 
 echo ""

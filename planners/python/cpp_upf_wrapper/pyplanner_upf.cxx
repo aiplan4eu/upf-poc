@@ -8,6 +8,10 @@
 namespace py = pybind11;
 
 
+void init() {}
+
+void uninit() {}
+
 py::object convert_problem(upf::Problem& problem)
 {
   auto pyplanner = py::module::import("pyplanner");

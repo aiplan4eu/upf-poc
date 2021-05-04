@@ -48,9 +48,10 @@ int main() {
   auto problem = generate_problem(size);
 
   std::vector<std::string>
-    planners = {"cppplanner_upf.so", "pyplanner_upf.so", "jplanner_upf.so"};
+    planners = {"cppplanner_upf.so", "pyplanner_upf.so", "jplanner_upf.so", "jplanner_upf_grpc.so"};
 
   for (auto& planner : planners) {
+    upf::init(planner);
     {
       auto clock = std::chrono::steady_clock::now();
       if (auto plan = upf::solve(planner, problem)) {
@@ -90,6 +91,7 @@ int main() {
         = std::chrono::duration_cast<std::chrono::milliseconds>(now - clock);
       std::cout << planner << " with heuristic: " << duration.count() << "ms" << std::endl;
     }
+    upf::uninit(planner);
   }
 
   return 0;

@@ -39,14 +39,16 @@ def main():
 
     problem = generate_problem(size)
 
-    planners = ["cppplanner_upf.so", "pyplanner_upf.so", "jplanner_upf.so"]
+    planners = ["cppplanner_upf.so", "pyplanner_upf.so", "jplanner_upf.so", "jplanner_upf_grpc.so"]
     for name in planners:
+        upf.init(name)
         with Timing("%s with no heuristic" % name):
             plan = upf.solve(name, problem)
             print(plan)
         with Timing("%s with heuristic" % name):
             plan = upf.solve_with_heuristic(name, problem, GoalCounterHeuristic(size, problem))
             print(plan)
+        upf.uninit(name)
 
 
 if __name__ == '__main__':

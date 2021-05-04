@@ -107,6 +107,10 @@ private:
   std::unique_ptr<JPlannerUPF::Stub> stub_;
 };
 
+void init() {}
+
+void uninit() {}
+
 std::optional<std::vector<std::string>> solve(upf::Problem& problem)
 {
   JPlannerUPFClient client(

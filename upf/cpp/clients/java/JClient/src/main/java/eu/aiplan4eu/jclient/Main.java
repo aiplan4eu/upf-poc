@@ -29,7 +29,7 @@ public class Main {
     public static void main(String[] args) throws InterruptedException {
         Problem problem = generateProblem(14);
 
-        List<String> planners = List.of("cppplanner_upf.so", "pyplanner_upf.so", "jplanner_upf.so");
+        List<String> planners = List.of("cppplanner_upf.so", "pyplanner_upf.so", "jplanner_upf.so", "jplanner_upf_grpc.so");
 
         String target = "localhost:50052";
         ManagedChannel channel = ManagedChannelBuilder.forTarget(target).usePlaintext().build();
