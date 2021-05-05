@@ -99,7 +99,7 @@ class Main {
             }
             System.out.println(plan2);
             System.out.println(planner + " with heuristic: " + (end - begin) + "ms");
-            UPF.uninit(planner);
+            //UPF.uninit(planner);
         }
 
     }
