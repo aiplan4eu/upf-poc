@@ -78,17 +78,6 @@ echo " -> Compiling the UPF..."
 bash compile_upf.sh &> /dev/null
 echo "    Done."
 
-echo " -> Launching C++ UPF Server..."
-cd ${DIR}/upf/cpp/grpc
-echo " -> Compiling..."
-bash compile_grpc_server.sh &> /dev/null
-echo "    Done."
-cd ..
-bash run_grpc_server.sh &
-UPF_SERVER_PID=$!
-sleep 1
-cd ${DIR}
-
 echo " -> Compiling Planner Wrappers..."
 echo "    - C++"
 bash ${DIR}/planners/cpp/cpp_upf_wrapper/compile_cppwrapper.sh
@@ -101,6 +90,17 @@ cd ${DIR}/planners/java/cpp_upf_wrapper
 bash compile.sh &> /dev/null
 cd ${DIR}
 echo "    Done."
+
+echo " -> Launching C++ UPF Server..."
+cd ${DIR}/upf/cpp/grpc
+echo " -> Compiling..."
+bash compile_grpc_server.sh &> /dev/null
+echo "    Done."
+cd ..
+bash run_grpc_server.sh &
+UPF_SERVER_PID=$!
+sleep 1
+cd ${DIR}
 
 echo ""
 echo "TSB written in Python"
