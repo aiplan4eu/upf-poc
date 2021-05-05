@@ -31,7 +31,7 @@ bash ${DIR}/planners/cpp/py_upf_wrapper/compile_pywrapper.sh
 echo "    - Java"
 bash ${DIR}/planners/java/grpc_pyclient/build_grpc.sh
 cd ${DIR}/planners/java/py_upf_wrapper_javacpp
-bash compile.sh
+bash compile.sh &> /dev/null
 cd ${DIR}
 echo "    Done."
 
@@ -51,7 +51,7 @@ echo ""
 echo "TSB written in Java"
 echo "-------------------"
 cd ${DIR}/upf/python/clients/java/JavacppClient
-bash compile.sh
+bash compile_jupf.sh &> /dev/null
 bash run.sh
 cd ${DIR}
 
@@ -98,7 +98,7 @@ echo "    - Java"
 bash ${DIR}/planners/java/grpc_cpp_client/build_grpc.sh
 bash ${DIR}/planners/java/grpc_cpp_client/compile_cppwrapper.sh
 cd ${DIR}/planners/java/cpp_upf_wrapper
-bash compile.sh
+bash compile.sh &> /dev/null
 cd ${DIR}
 echo "    Done."
 
