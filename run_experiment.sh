@@ -30,6 +30,9 @@ echo "    - C++"
 bash ${DIR}/planners/cpp/py_upf_wrapper/compile_pywrapper.sh
 echo "    - Java"
 bash ${DIR}/planners/java/grpc_pyclient/build_grpc.sh
+cd ${DIR}/planners/java/py_upf_wrapper_javacpp
+bash compile.sh
+cd ${DIR}
 echo "    Done."
 
 echo ""
@@ -42,6 +45,14 @@ echo "TSB written in Java via GRPC"
 echo "-------------------"
 cd ${DIR}/upf/python/clients/java/JClient
 ./gradlew --console plain -q runClient
+cd ${DIR}
+
+echo ""
+echo "TSB written in Java"
+echo "-------------------"
+cd ${DIR}/upf/python/clients/java/JavacppClient
+bash compile.sh
+bash run.sh
 cd ${DIR}
 
 echo ""

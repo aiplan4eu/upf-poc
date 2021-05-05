@@ -2,7 +2,7 @@ import atexit
 import _jplanner_upf as jp
 
 jp.init()
-atexit.register(jp.uninit)
+#atexit.register(jp.uninit)
 
 
 def _upf_action_to_java(action):

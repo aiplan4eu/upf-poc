@@ -59,7 +59,7 @@ def solve_with_heuristic(problem, heuristic):
         while True:
             response = ssw.read()
             if response.HasField('stateToEvaluate'):
-                state = frozenset(response.stateToEvaluate.state)
+                state = set(response.stateToEvaluate.state)
                 ssw.write(ProblemOrHAnswer(stateEvaluation=heuristic(state)))
             else:
                 ssw.close()
