@@ -1,0 +1,21 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: mikand/tamer:ubuntu20
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - run: |
+          pip3 install grpcio
+          bash run_python_experiment.sh
