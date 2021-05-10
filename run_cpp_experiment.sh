@@ -11,6 +11,7 @@ echo "--------------------------------------------------------------------------
 
 echo " -> Launching Java GRPC Planning Server..."
 cd ${DIR}/planners/java/JPlanner
+./gradlew build &> /dev/null
 ./gradlew runServer &> /dev/null &
 JAVA_SERVER_PID=$!
 sleep 5
