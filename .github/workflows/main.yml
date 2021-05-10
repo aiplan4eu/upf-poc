@@ -11,14 +11,11 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    container: mikand/tamer:ubuntu20
+    container: aiplan4eu/upf
 
     steps:
       - uses: actions/checkout@v2
 
-      - run: |
-          git submodule update --init --recursive
-          apt-get install -y python3-pip
-          pip3 install grpcio
-          pip3 install grpcio-tools
-          bash run_python_experiment.sh
+      - run: git submodule update --init --recursive
+
+      - run: bash run_python_experiment.sh
